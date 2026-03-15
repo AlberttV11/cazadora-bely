@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palabra Secreta - WhatsApp</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        input {
+            padding: 15px 20px;
+            width: 300px;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+            transition: border-color 0.3s;
+            margin-bottom: 20px;
+        }
+
+        input:focus {
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 18px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: transform 0.3s, background 0.3s;
+        }
+
+        button:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+
+        /* Animaciones */
+        .animate {
+            animation: celebration 1s ease-in-out;
+        }
+
+        @keyframes celebration {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2) rotate(10deg); }
+            75% { transform: scale(0.9) rotate(-10deg); }
+            100% { transform: scale(1) rotate(0); }
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #f00;
+            animation: fall 3s linear;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+            }
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <h1>🔐 Palabra Secreta</h1>
+        <input type="text" id="palabraInput" placeholder="Escribe la palabra secreta...">
+        <br>
+        <button onclick="verificarPalabra()">Verificar</button>
+        
+        <div id="mensaje" class="message"></div>
+    </div>
+
+    <script>
+        // Configuración - ¡CAMBIA ESTOS VALORES!
+        const PALABRA_CORRECTA = "secreto"; // La palabra que activará todo
+        const NUMERO_WHATSAPP = "524521444256"; // Número con código de país sin +
+        const MENSAJE_WHATSAPP = "¡Alguien ha descubierto la palabra secreta! 🎉";
+
+        function verificarPalabra() {
+            const input = document.getElementById('palabraInput');
+            const container = document.getElementById('container');
+            const mensajeDiv = document.getElementById('mensaje');
+            const palabraIngresada = input.value.trim().toLowerCase();
+
+            // Limpiar mensajes anteriores
+            mensajeDiv.style.display = 'none';
+            mensajeDiv.className = 'message';
+
+            if (palabraIngresada === PALABRA_CORRECTA) {
+                // Palabra correcta - Activar todo
+                
+                // 1. Mostrar mensaje de éxito
+                mensajeDiv.textContent = '🎉 ¡Palabra correcta! Enviando mensaje...';
+                mensajeDiv.className = 'message success';
+                mensajeDiv.style.display = 'block';
+                
+                // 2. Animar el contenedor
+                container.classList.add('animate');
+                
+                // 3. Crear confeti
+                crearConfeti();
+                
+                // 4. Enviar mensaje de WhatsApp
+                enviarWhatsApp();
+                
+                // 5. Remover la animación después de que termine
+                setTimeout(() => {
+                    container.classList.remove('animate');
+                }, 1000);
+                
+            } else {
+                // Palabra incorrecta
+                mensajeDiv.textContent = '❌ Palabra incorrecta. Intenta de nuevo.';
+                mensajeDiv.className = 'message error';
+                mensajeDiv.style.display = 'block';
+                
+                // Animación de error (shake)
+                input.style.animation = 'none';
+                input.offsetHeight; // Forzar reflow
+                input.style.animation = 'shake 0.5s';
+                
+                setTimeout(() => {
+                    input.style.animation = '';
+                }, 500);
+            }
+        }
+
+        function enviarWhatsApp() {
+            // Crear el enlace de WhatsApp
+            const url = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(MENSAJE_WHATSAPP)}`;
+            
+            // Abrir en una nueva ventana (o pestaña)
+            window.open(url, '_blank');
+            
+            // Alternativa: abrir en la misma ventana
+            // window.location.href = url;
+        }
+
+        function crearConfeti() {
+            for (let i = 0; i < 50; i++) {
+                const confeti = document.createElement('div');
+                confeti.className = 'confeti';
+                
+                // Estilos aleatorios para cada confeti
+                confeti.style.left = Math.random() * 100 + 'vw';
+                confeti.style.animationDelay = Math.random() * 2 + 's';
+                confeti.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                confeti.style.width = Math.random() * 15 + 5 + 'px';
+                confeti.style.height = confeti.style.width;
+                
+                document.body.appendChild(confeti);
+                
+                // Eliminar el confeti después de la animación
+                setTimeout(() => {
+                    confeti.remove();
+                }, 3000);
+            }
+        }
+
+        // Agregar animación de shake para errores
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                20%, 40%, 60%, 80% { transform: translateX(5px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Permitir enviar con Enter
+        document.getElementById('palabraInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                verificarPalabra();
+            }
+        });
+    </script>
+</body>
+</html>
